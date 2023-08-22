@@ -3,11 +3,9 @@ package org.example.Layout;
 import lombok.Data;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,6 +17,7 @@ public class CalculatriceLayout {
     private JButton jButton;
     private String entry = "";
     private String labelText = "";
+    private String labelTextHaut = "";
 
     private Double firstValue;
     private Double secondValue;
@@ -35,19 +34,29 @@ public class CalculatriceLayout {
 
         List<String> list = Arrays.asList("C", "²", "%", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", "0", ".", "=");
 
-        Label label = new Label();
-        label.setFont(new Font("name", 1, 25));
-        label.setText(entry);
-        label.setBackground(Color.BLACK);
-        label.setForeground(Color.white);
+        Label ecrandHaut = new Label("test");
+        ecrandHaut.setFont(new Font("name", 1, 25));
+        ecrandHaut.setText(entry);
+        ecrandHaut.setBackground(Color.BLACK);
+        ecrandHaut.setForeground(Color.white);
+
+        Label ecrandBas = new Label("test");
+        ecrandBas.setFont(new Font("name", 1, 35));
+        ecrandBas.setText(entry);
+        ecrandBas.setBackground(Color.BLACK);
+        ecrandBas.setForeground(Color.white);
+
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = 4;
-        c.gridheight = 2;
-        c.gridy = 0;
-        c.gridx = 0;
+        c.gridheight = 1;
         c.weightx = 1;
         c.weighty = 1;
-        jPanel.add(label, c);
+
+        c.gridy = 0;
+        c.gridx = 0;
+        jPanel.add(ecrandHaut, c);
+        c.gridy = 1;
+        jPanel.add(ecrandBas, c);
 
         int cpt = 0;
 
@@ -79,6 +88,11 @@ public class CalculatriceLayout {
                         entry = ((JButton) (e.getSource())).getText();
                         switch (entry) {
                             case "C":
+                                if(labelText == ""){
+                                    firstValue = null;
+                                    secondValue = null;
+                                    methode = "";
+                                }
                                 labelText = "";
                                 break;
                             case "/":
@@ -88,28 +102,35 @@ public class CalculatriceLayout {
                             case "%":
                                 methode = entry;
                                 firstValue = Double.parseDouble(labelText);
-                                labelText ="";
+                                labelText = "";
                                 break;
                             case "²":
-                                methode ="";
+                                methode = "";
                                 firstValue = Double.parseDouble(labelText);
-                                labelText = ""+(firstValue * firstValue);
-                                firstValue =0D;
-                                secondValue =0D;
+                                labelText = "" + (firstValue * firstValue);
+                                firstValue = null;
+                                secondValue = null;
 
                                 break;
                             case "=":
                                 secondValue = Double.parseDouble(labelText);
-                                labelText = calcul(methode,firstValue,secondValue).toString();
-                                firstValue =0D;
-                                secondValue =0D;
-                                methode ="";
+                                labelText = calcul(methode, firstValue, secondValue).toString();
+                                labelTextHaut = firstValue + " " + methode + " " + secondValue +" =";
+                                firstValue = null;
+                                secondValue = null;
+                                methode = "";
+
                                 break;
                             default:
                                 labelText += entry;
                                 break;
                         }
-                        label.setText(labelText);
+                        ecrandBas.setText(labelText);
+                        ecrandHaut.setText(labelTextHaut);
+                        labelTextHaut = "";
+                        if (firstValue != null) {
+                            ecrandHaut.setText(firstValue.toString());
+                        }
                     }
                 });
                 jPanel.add(jButton, c);
@@ -117,7 +138,8 @@ public class CalculatriceLayout {
             }
         }
     }
-    private Double calcul (String methode, Double firstValue, Double secondValue){
+
+    private Double calcul(String methode, Double firstValue, Double secondValue) {
         return switch (methode) {
             case "+" -> firstValue + secondValue;
             case "-" -> firstValue - secondValue;
